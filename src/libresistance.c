@@ -8,6 +8,7 @@ float calc_resistance(int count, char conn, float* array)
 {
     float res = 0;
     int i = 0;
+
     if (array == NULL || count < 1)
         return -1;
 
@@ -26,5 +27,6 @@ float calc_resistance(int count, char conn, float* array)
         default:
             return -1;
     }
+
     return res;
 }
