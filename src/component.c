@@ -12,8 +12,8 @@ int cmpfloat(const void *_a, const void *_b)
 {
   const float *a = _a;
   const float *b = _b;
-  if (*a > *b) return 1;
-  if (*a < *b) return -1;
+  if (*a > *b) return -1;
+  if (*a < *b) return 1;
   return 0;
 }
 
