@@ -2,10 +2,11 @@
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "resistance.h"
 
-#include <stdio.h>
+#define MAX_NBR_COMP 3
 
 
 int cmpfloat(const void *_a, const void *_b)
@@ -15,6 +16,45 @@ int cmpfloat(const void *_a, const void *_b)
   if (*a > *b) return -1;
   if (*a < *b) return 1;
   return 0;
+}
+
+void sort_components_low_to_high(float *r)
+{
+  // Simpler to always work with a sorted list of components
+
+  qsort(r, MAX_NBR_COMP, sizeof(r[0]), cmpfloat);
+}
+
+
+int count_nbr_components(const float *r)
+{
+  // Count number of resistors in r, fewer resistors is better
+
+  int nbr_components = 0;
+  for (int i = 0; i < MAX_NBR_COMP; i++) {
+    if (r[i] <= 0) {
+      break;
+    }
+    nbr_components++;
+  }
+  return nbr_components;
+}
+
+
+int count_nbr_values(const float *r)
+{
+  // Count number of different values used, fewer different values is better
+
+  int nbr_values = 1;
+  for (int i = 1; i < MAX_NBR_COMP; i++) {
+    if (r[i] <= 0) {
+      break;
+    }
+    if (r[i-1] != r[i]) {
+      nbr_values++;
+    }
+  }
+  return nbr_values;
 }
 
 
@@ -38,9 +78,10 @@ int e_resistance(float orig_resistance, float *res_array)
     }
   }
 
-  int i_idx, k_idx, m_idx;
-  float best[3] = {-1, -1, -1};
+  float best[MAX_NBR_COMP] = {-1, -1, -1};
   float best_diff = MAXFLOAT;
+  int best_nbr_values = INT_MAX;
+  int best_nbr_components = INT_MAX;
 
   float i_scale = 1.0;
   for (int i = 0, i_idx = idx_max_value; i < nbr_test; i++, i_idx++) {
@@ -69,57 +110,39 @@ int e_resistance(float orig_resistance, float *res_array)
 	if (m == nbr_test-1) {
 	  m_scale = 0;
 	}
-	float r[3] = {E12[i_idx] * i_scale, E12[k_idx] * k_scale, E12[m_idx] * m_scale};
-	float test = calc_resistance(3, 'S', r);
+	float r[MAX_NBR_COMP] = {E12[i_idx] * i_scale, E12[k_idx] * k_scale, E12[m_idx] * m_scale};
+	float test = calc_resistance(MAX_NBR_COMP, 'S', r);
 	float diff = fabs(base - test);
-	/* if (i_idx==11&&k_idx==11&&m_idx==11){ */
-	/*   printf("{%f %f %f} ", r[0], r[1], r[2]); */
-	/*   printf("[%g %g %g] ", i_scale, k_scale, m_scale); */
-	/*   printf("> %f %f %f\n", test, diff, best_diff); */
-	/* } */
-	//	printf("test: %f, diff %f\n", test, diff);
 
-	// Count number of resistors in r and best, fewer resisters is better
-	int cnt_best = ((best[0] > 0)?1:0) + ((best[1] > 0)?1:0) + ((best[2] > 0)?1:0);
-	int cnt_r = ((r[0] > 0)?1:0) + ((r[1] > 0)?1:0) + ((r[2] > 0)?1:0);
+	sort_components_low_to_high(r);
 
-	// Count number of different values used, fewer different values is better
+	int nbr_components = count_nbr_components(r);
 
-	qsort(r, 3, sizeof(r[0]), cmpfloat);
-	if (cnt_r == 1) {
-	  nbr_values_r = 1;
-	} else if (cnt_r == 2) {
-	  nbr_values_r = (r[0] == r[1]) ? 1 : 2;
-	} else {
-	  if (r[0] == r[1] && r[1] == r[2]) {
-	    nbr_values_r = 3;
-	  } else if (r[0] == r[1] || r[1] == r[2]) {
-	    nbr_values_r = 2;
-	  }
-	}
-	for (int i = 0; i < 3; i++) {
-	  if (r[0] <= 0) break;
-	  
-	}
+	int nbr_values = count_nbr_values(r);
+
 	if (diff < best_diff ||
-	    (diff == best_diff && cnt_r < cnt_best) ||
-	    (diff == best_diff && cnt_r == cnt_best && nbr_values_r < nbr_values_best)) {
-	  best[0] = r[0];
-	  best[1] = r[1];
-	  best[2] = r[2];
+	    (diff == best_diff && nbr_components < best_nbr_components) ||
+	    (diff == best_diff && nbr_components == best_nbr_components && nbr_values < best_nbr_values)) {
+	  for (int i = 0; i < MAX_NBR_COMP; i++) {
+	    best[i] = r[i];
+	  }
 	  best_diff = diff;
+	  best_nbr_values = nbr_values;
+	  best_nbr_components = nbr_components;
 	}
       }
     }
   }
-  printf("-- %f %f %f %f\n", best[0], best[1], best[2], best_diff);
+
   int count = 0;
-  for (int i = 0; i < 3; i++) {
-    if (best[i] > 0.0) {
-      *res_array = best[i] * exp10f(exp);
-      res_array++;
-      count++;
+  for (int i = 0; i < MAX_NBR_COMP; i++) {
+    if (best[i] <= 0.0) {
+      break;
     }
+
+    *res_array = best[i] * exp10f(exp);
+    res_array++;
+    count++;
   }
   
   return count;
