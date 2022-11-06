@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-	// printf() displays the string inside quotation
+
 	float volt;
 	char conn;
 	int count;
@@ -26,6 +26,6 @@ int main() {
 		scanf("%f",array[i]);
 		printf("\n");
 	}
-
+	
    return 0;
 }
