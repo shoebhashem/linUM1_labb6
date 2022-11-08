@@ -19,11 +19,10 @@ lib/libcomponent.so: $(BUILD_DIR)/src/component.o
 
 lib/libresistance.so: $(BUILD_DIR)/src/resistance.o
 
-# Uncomment next when libpower source is available
-#lib/libpower.so: $(BUILD_DIR)/src/power.o
+lib/libpower.so: $(BUILD_DIR)/src/power.o
 
 
-LIB_FILES:=lib/libcomponent.so lib/libresistance.so
+LIB_FILES:=lib/libcomponent.so lib/libresistance.so lib/libpower.so
 
 
 
@@ -67,7 +66,7 @@ lib/%.so:
 	mkdir -p $(dir $@)
 	$(CC) $^ -shared -o $@
 
-electrotest: $(BUILD_DIR)/src/electrotest.o
+electrotest: $(BUILD_DIR)/src/main.o
 	gcc -Llib -Wall -Wl,-rpath,'$$ORIGIN/lib' $^ -o $@ -lresistance
 
 clean:
