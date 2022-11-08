@@ -38,4 +38,4 @@ power = calc_power_r(volt, resistance);
 printf("%f\n", power);
 power = calc_power_i(volt, current);
 printf("%f\n", power);
-}*/-
+}*/
