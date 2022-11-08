@@ -28,7 +28,7 @@ int main() {
 		printf("\n");
 	}
 
-	printf("Ersättningsresistans:%c\n", conn);
+	printf("Ersättningsresistans:\n");
 	float er_r = calc_resistance(count, conn, array);
 	printf("%f ohm\n", er_r);
 
