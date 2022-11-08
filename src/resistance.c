@@ -2,7 +2,7 @@
  * Lexx Damm
  */
 
-#include "resistance.h"
+#include "libresistance.h"
 #include <stddef.h>
 
 float calc_resistance(int count, char conn, float* array)
