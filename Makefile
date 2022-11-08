@@ -67,7 +67,7 @@ lib/%.so:
 	$(CC) $^ -shared -o $@
 
 electrotest: $(BUILD_DIR)/src/main.o
-	gcc -Llib -Wall -Wl,-rpath,'$$ORIGIN/lib' $^ -o $@ -lresistance
+	gcc -Llib -Wall -Wl,-rpath,'$$ORIGIN/lib' $^ -o $@ -lresistance -lpower -lcomponent -lm 
 
 clean:
 	rm -rf $(BUILD_DIR) $(LIB_DIR) electrotest
