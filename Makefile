@@ -23,6 +23,7 @@ lib/libpower.so: $(BUILD_DIR)/src/power.o
 
 
 LIB_FILES:=lib/libcomponent.so lib/libresistance.so lib/libpower.so
+H_FILES:=src/component.h src/resistance.h src/power.h
 
 
 
@@ -75,3 +76,4 @@ clean:
 install: $(LIB_FILES) electrotest
 	install -C electrotest /usr/bin
 	install -C $(LIB_FILES) /usr/lib
+	install -C $(H_FILES) /usr/include
